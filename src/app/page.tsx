@@ -1,7 +1,8 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Player } from "@lottiefiles/react-lottie-player";
+import dynamic from "next/dynamic";
+// import { Player } from "@lottiefiles/react-lottie-player";
 
 const navLinks = [
   { label: "Home", to: "index" },
@@ -20,12 +21,7 @@ interface FeaturedWorkItem {
   details: string;
 }
 
-function scrollToSection(id: string) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth" });
-  }
-}
+function scrollToSection(id: string) {}
 
 function LoadingSplash() {
   return (
@@ -68,31 +64,37 @@ function LoadingSplash() {
   );
 }
 
+const Player = dynamic(() => import("@lottiefiles/react-lottie-player").then(mod => mod.Player), { ssr: false });
+
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [navBg, setNavBg] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [modal, setModal] = useState<FeaturedWorkItem | null>(null);
 
-  useEffect(() => {
-    const onScroll = () => {
-      setNavBg(window.scrollY > 30);
-      setMenuOpen(false); // Close menu on scroll
-    };
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     const onScroll = () => {
+  //       setNavBg(window.scrollY > 30);
+  //       setMenuOpen(false); // Close menu on scroll
+  //     };
+  //     window.addEventListener("scroll", onScroll);
+  //     return () => window.removeEventListener("scroll", onScroll);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     if (menuOpen) {
+  //       document.body.style.overflow = "hidden";
+  //     } else {
+  //       document.body.style.overflow = "";
+  //     }
+  //     return () => {
+  //       document.body.style.overflow = "";
+  //     };
+  //   }
+  // }, [menuOpen]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 1200);
@@ -498,37 +500,37 @@ export default function Home() {
 // TestimonialsCarousel component (add at the bottom of the file)
 function TestimonialsCarousel() {
   const testimonials = [
-    { quote: "Anny's Chin Chin was the highlight of our party! Everyone loved it.", author: "Ada, Event Planner" },
+    { quote: "Anny&apos;s Chin Chin was the highlight of our party! Everyone loved it.", author: "Ada, Event Planner" },
     { quote: "Her coaching helped me find my voice and confidence on stage.", author: "Chinedu, Singer" },
-    { quote: "Anny's performance made our wedding unforgettable. Highly recommended!", author: "Tolu & Femi, Newlyweds" },
+    { quote: "Anny&apos;s performance made our wedding unforgettable. Highly recommended!", author: "Tolu & Femi, Newlyweds" },
     { quote: "Professional, talented, and a joy to work with.", author: "Seyi, Event Host" },
   ];
-  const [idx, setIdx] = useState(0);
+  const [currentIdx, setCurrentIdx] = useState(0);
   useEffect(() => {
-    const timer = setTimeout(() => setIdx((i) => (i + 1) % testimonials.length), 4000);
+    const timer = setTimeout(() => setCurrentIdx((i) => (i + 1) % testimonials.length), 4000);
     return () => clearTimeout(timer);
-  }, [idx, testimonials.length]);
+  }, [currentIdx, testimonials.length]);
   return (
     <div className="relative w-full flex flex-col items-center">
       <AnimatePresence mode="wait">
         <motion.blockquote
-          key={idx}
+          key={currentIdx}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -30 }}
           transition={{ duration: 0.5 }}
           className="bg-white border border-black/10 rounded-2xl p-6 shadow-sm w-full text-center"
         >
-          <p className="text-lg font-sans mb-2">&quot;{testimonials[idx].quote}&quot;</p>
-          <footer className="text-xs text-gray-500">— {testimonials[idx].author}</footer>
+          <p className="text-lg font-sans mb-2">&quot;{testimonials[currentIdx].quote}&quot;</p>
+          <footer className="text-xs text-gray-500">— {testimonials[currentIdx].author}</footer>
         </motion.blockquote>
       </AnimatePresence>
       <div className="flex gap-2 mt-4">
         {testimonials.map((_, i) => (
           <button
             key={i}
-            className={`w-2.5 h-2.5 rounded-full ${i === idx ? "bg-[#e11d48]" : "bg-gray-300"}`}
-            onClick={() => setIdx(i)}
+            className={`w-2.5 h-2.5 rounded-full ${i === currentIdx ? "bg-[#e11d48]" : "bg-gray-300"}`}
+            onClick={() => setCurrentIdx(i)}
             aria-label={`Show testimonial ${i + 1}`}
           />
         ))}
